@@ -1,4 +1,5 @@
 import Product from "../models/ProductModel.js";
+import { Sequelize } from "sequelize";
 
 export const getProduct = async (req, res) => {
   try {
@@ -91,3 +92,22 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const searchProduct = async(req, res) => {
+    const searchQuery = req.query.q;
+
+  try {
+    const products = await Product.findAll({
+      where: {
+        name: {
+          [Sequelize.Op.like]: `%${searchQuery}%`,
+        },
+      },
+    });
+
+    res.json(products);
+  } catch (err) {
+    console.error('Error searching products:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
